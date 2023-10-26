@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     [SerializeField] private float speed;
     [SerializeField] private float jump;
-
-    private Vector2 currentRotation;
 
     [Header("Camera")]
     [SerializeField, Range(1, 20)] private float mouseSensX;
@@ -25,24 +25,50 @@ public class Player : MonoBehaviour
     [SerializeField] private Rigidbody bulletPrefab;
     [SerializeField] private float bulletForce;
 
-    private bool isGrounded;
-    private Vector3 _moveDirection;
+    [Header("Player UI")]
+    [SerializeField] private Image healthBar;
+    [SerializeField] private TextMeshProUGUI shotsFired;
+
+    [SerializeField] private float maxHealth;
+    private float _health;
+
+    private int maxShots = 10;
+    public int shotsFiredCounter;
+
+    private float Health
+    {
+        get => _health;
+        set
+        {
+            _health = value;
+            healthBar.fillAmount = _health / maxHealth;
+        }
+    }
 
     private Rigidbody rb;
 
-     void Start()
+    private bool isGrounded;
+    private Vector3 _moveDirection;
+    
+    void Start()
     {
         InputManager.Init(this);
         InputManager.Gamemode();
 
         rb = GetComponent<Rigidbody>();
+
+        Health = maxHealth;
+
+        shotsFiredCounter = maxShots;
     }
 
      void Update()
     {
         transform.position +=  transform.rotation * (speed * Time.deltaTime * _moveDirection);
         checkGrounded();
-       
+
+        Health -= Time.deltaTime * 5;
+
     }
 
     public void SetMovementDirection(Vector3 newDirection)
@@ -80,9 +106,26 @@ public class Player : MonoBehaviour
 
     public void Shoot()
     {
+        if (shotsFiredCounter <= 0)
+        {
+            return;
+        }
+
         Rigidbody currentProjectile = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
 
         currentProjectile.AddForce(followTarget.forward * bulletForce, ForceMode.Impulse);
+
+        shotsFired.text = (shotsFiredCounter-1).ToString();
+        
+        shotsFiredCounter--;
+
         Destroy(currentProjectile.gameObject, 3);
+    }
+
+    public void Reload()
+    {
+        Debug.Log("Reloading");
+        shotsFiredCounter = maxShots;
+
     }
 }

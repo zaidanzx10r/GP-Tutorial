@@ -34,6 +34,11 @@ public static class InputManager
             myPlayer.Shoot();
         };
 
+        _controls.Game.Reload.performed += ctx =>
+        {
+            myPlayer.Reload();
+        };
+
         _controls.Permanent.Enable();
 
 
