@@ -16,14 +16,14 @@ public class AmmoPack : MonoBehaviour
     {
         if (other.transform.tag == "Player")
         {
-            if (playerScript.shotsFiredCounter > 5)
-            {
-                return;
-            }
-
             Debug.Log("AmmoPack Hit!");
             playerScript.shotsFiredCounter = playerScript.shotsFiredCounter + 5;
             Destroy(gameObject);
+
+            if (playerScript.shotsFiredCounter > 10)
+            {
+                playerScript.shotsFiredCounter = 10;
+            }
         }
     }
 }
